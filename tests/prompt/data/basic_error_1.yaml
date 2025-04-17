@@ -1,0 +1,30 @@
+api: drtail/prompt
+version: 1.0.0
+
+name: Basic Prompt
+description: A basic prompt for DrTail
+authors:
+  - name: Humphrey Ahn
+    email: ahnsv@bc.edu
+metadata:
+  role: todo
+  domain: consultation
+  action: extract
+output:
+  type: pydantic
+  model: invalid.model.path.NonExistentModel # relative path from this prompt file to schema python file
+  # schema:
+  #   name: BasicPromptOutput
+  #   fields:
+  #     - name: location
+  #       type: str
+  #     - name: capital
+  #       type: str
+
+messages:
+  - role: developer
+    content: |
+      You are a helpful assistant that extracts information from a conversation.
+      The capital of {{location}} is {{capital}}.
+  - role: user
+    content: What is the capital of the moon?
