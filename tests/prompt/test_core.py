@@ -1,14 +1,15 @@
 import pytest
 import yaml
-from prompt.exception import PromptValidationError
+from prompt.core import load_prompt
+from prompt.exception import PromptValidationError, PromptVersionMismatchError
 from prompt.schema import BasicPromptSchema
 
 
-@pytest.mark.parametrize("prompt_path", ["basic.yaml", "basic_2.yaml"])
+@pytest.mark.parametrize(
+    "prompt_path", ["basic_1.yaml", "basic_2.yaml", "basic_3.yaml"]
+)
 def test_prompt_schema(prompt_path: str):
-    with open(f"tests/prompt/data/{prompt_path}", "r") as file:
-        yaml_data = yaml.safe_load(file)
-        prompt = BasicPromptSchema(**yaml_data)
+    prompt = load_prompt(f"tests/prompt/data/{prompt_path}")
 
     assert prompt.api == "drtail/prompt"
     assert prompt.version == "1.0.0"
@@ -31,3 +32,17 @@ def test_prompt_validation_error():
         with pytest.raises(PromptValidationError) as exc:
             BasicPromptSchema(**yaml_data)
         assert "model" in str(exc.value)
+
+
+def test_prompt_version_mismatch_error():
+    with pytest.raises(PromptVersionMismatchError) as exc:
+        load_prompt("tests/prompt/data/basic_newer_version.yaml")
+    assert "version" in str(exc.value)
+
+
+def test_prompt_output_validation_error():
+    assert False
+
+
+def test_prompt_input_validation_error():
+    assert False

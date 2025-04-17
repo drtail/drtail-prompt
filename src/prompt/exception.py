@@ -4,3 +4,7 @@ class DrTailPromptBaseException(Exception):
 
 class PromptValidationError(DrTailPromptBaseException):
     pass
+
+
+class PromptVersionMismatchError(DrTailPromptBaseException):
+    pass
