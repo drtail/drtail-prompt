@@ -21,5 +21,6 @@ packages = ["src/prompt"]
 
 [dependency-groups]
 dev = [
+    "openai>=1.75.0",
     "pytest>=8.3.5",
 ]

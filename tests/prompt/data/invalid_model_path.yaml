@@ -10,15 +10,12 @@ metadata:
   role: todo
   domain: consultation
   action: extract
+input:
+  type: pydantic
+  model: invalid.model.path.NonExistentModel # relative path from this prompt file to schema python file
 output:
   type: pydantic
-  schema:
-    name: BasicPromptOutput
-    fields:
-      - name: location
-        type: str
-      - name: capital
-        type: str
+  model: invalid.model.path.NonExistentModel # relative path from this prompt file to schema python file
 
 messages:
   - role: developer
