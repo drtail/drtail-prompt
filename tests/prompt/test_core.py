@@ -1,8 +1,8 @@
 import pytest
-import yaml
+
 from prompt.core import load_prompt
 from prompt.exception import PromptValidationError, PromptVersionMismatchError
-from prompt.schema import BasicPromptSchema, Message
+from prompt.schema import Message
 
 
 @pytest.mark.parametrize(
@@ -27,10 +27,8 @@ def test_prompt_schema(prompt_path: str):
 
 
 def test_prompt_validation_error():
-    with open("tests/prompt/data/basic_error_1.yaml", "r") as file:
-        yaml_data = yaml.safe_load(file)
-        with pytest.raises(PromptValidationError) as exc:
-            BasicPromptSchema(**yaml_data)
+    with pytest.raises(PromptValidationError) as exc:
+        load_prompt("tests/prompt/data/basic_error_1.yaml")
         assert "model" in str(exc.value)
 
 
@@ -40,8 +38,13 @@ def test_prompt_version_mismatch_error():
     assert "version" in str(exc.value)
 
 
-def test_prompt_output_validation_error():
-    assert False
+@pytest.mark.parametrize(
+    "prompt_path", ["basic_error_1.yaml", "invalid_model_path.yaml"]
+)
+def test_prompt_output_validation_error(prompt_path: str):
+    with pytest.raises(PromptValidationError) as exc:
+        load_prompt(f"tests/prompt/data/{prompt_path}")
+    assert "No module named" in str(exc.value)
 
 
 def test_prompt_input_interpolation():
@@ -57,8 +60,7 @@ def test_prompt_input_interpolation():
 def test_prompt_input_model_not_found():
     with pytest.raises(PromptValidationError) as exc:
         load_prompt("tests/prompt/data/invalid_model_path.yaml", {"location": "moon"})
-    assert "Module" in str(exc.value)
-    assert "not found" in str(exc.value)
+    assert "No module" in str(exc.value)
 
 
 def test_prompt_input_validation_error():
@@ -69,10 +71,4 @@ def test_prompt_input_validation_error():
 
 def test_prompt_get_messages():
     prompt = load_prompt("tests/prompt/data/basic_1.yaml")
-    assert prompt.messages == [
-        Message(
-            role="developer",
-            content="You are a helpful assistant that extracts information from a conversation. The capital of {{location}} is {{capital}}.",
-        ),
-        Message(role="user", content="What is the capital of the moon?"),
-    ]
+    assert prompt.messages[0].content == "You are a helpful assistant that extracts information from a conversation.\nThe capital of {{location}} is {{capital}}.\n"

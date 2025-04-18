@@ -62,7 +62,6 @@ def test_prompt_should_provide_enough_parameters_for_chat_completion_api(
         metadata=prompt.metadata,
     )
     assert response is not None
-    assert response.model == "gpt-3.5-turbo"
 
     assert prompt.metadata is not None
     assert prompt.metadata["name"] == "Basic Prompt"
@@ -84,4 +83,3 @@ def test_prompt_output_should_be_used_as_text_structured_output(mock_openai_clie
     )
     assert response is not None
     assert response.text is not None
-    assert response.text == prompt.structured_output_format

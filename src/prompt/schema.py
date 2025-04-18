@@ -1,4 +1,6 @@
 from typing import Any, Optional
+from typing_extensions import Self
+
 
 from pydantic import BaseModel, Field, model_validator
 
@@ -44,15 +46,32 @@ class IOBase(BaseModel):
             raise ValueError("Instance is not set")
         return self.instance.model_validate(data)
 
+    @model_validator(mode="after")
+    def validate_instance(self) -> Self:
+        if not self.model and not self.schema_:
+            raise ValueError("Model or schema is not set")
 
-class Input(IOBase):
-    pass
+        if not self.type == "pydantic":
+            raise NotImplementedError("Only pydantic is supported for now")
+
+        if not self.model:
+            raise NotImplementedError("Schema is not supported for now")
+
+        module_path, class_name = self.model.rsplit(".", 1)
+
+        module = __import__(module_path, fromlist=[class_name])
+        input_model_pydantic: BaseModel = getattr(module, class_name)
+
+        if self.instance is None:
+            self.set_instance(input_model_pydantic)
+
+        return self
 
 
-class Output(IOBase):
-    def post_init(self, __context: Any) -> None:
-        print("Output post_init")
-        super().post_init(__context)
+class Input(IOBase): ...
+
+
+class Output(IOBase): ...
 
 
 class Message(BaseModel):

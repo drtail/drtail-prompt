@@ -47,7 +47,7 @@ class Prompt(BaseModel):
         return {
             "format": {
                 "type": "json_schema",
-                "name": schema["name"],
+                "name": schema["title"],
                 "schema": schema,
             }
         }
@@ -60,6 +60,8 @@ def load_prompt(path: str, inputs: dict[str, Any] | None = None) -> Prompt:
         try:
             prompt = BasicPromptSchema.model_validate(yaml_data)
         except ValidationError as e:
+            raise PromptValidationError(e) from e
+        except ModuleNotFoundError as e:
             raise PromptValidationError(e) from e
 
     if inputs:
