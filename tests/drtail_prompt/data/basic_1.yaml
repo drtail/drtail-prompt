@@ -12,7 +12,7 @@ metadata:
   action: extract
 output:
   type: pydantic
-  model: tests.prompt._schema.BasicPromptOutput # relative path from this prompt file to schema python file
+  model: tests.drtail_prompt._schema.BasicPromptOutput # relative path from this prompt file to schema python file
   # schema:
   #   name: BasicPromptOutput
   #   fields:

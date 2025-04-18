@@ -4,7 +4,7 @@ from typing_extensions import Self
 
 from pydantic import BaseModel, Field, model_validator
 
-from prompt.exception import PromptVersionMismatchError
+from drtail_prompt.exception import PromptVersionMismatchError
 
 SCHEMA_MAX_VERSION = "1.0.0"
 

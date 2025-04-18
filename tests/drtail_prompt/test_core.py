@@ -1,14 +1,14 @@
 import pytest
 
-from prompt.core import load_prompt
-from prompt.exception import PromptValidationError, PromptVersionMismatchError
+from drtail_prompt.core import load_prompt
+from drtail_prompt.exception import PromptValidationError, PromptVersionMismatchError
 
 
 @pytest.mark.parametrize(
     "prompt_path", ["basic_1.yaml", "basic_2.yaml", "basic_3.yaml"]
 )
 def test_prompt_schema(prompt_path: str):
-    prompt = load_prompt(f"tests/prompt/data/{prompt_path}")
+    prompt = load_prompt(f"tests/drtail_prompt/data/{prompt_path}")
 
     assert prompt.data.api == "drtail/prompt"
     assert prompt.data.version == "1.0.0"
@@ -27,13 +27,13 @@ def test_prompt_schema(prompt_path: str):
 
 def test_prompt_validation_error():
     with pytest.raises(PromptValidationError) as exc:
-        load_prompt("tests/prompt/data/basic_error_1.yaml")
+        load_prompt("tests/drtail_prompt/data/basic_error_1.yaml")
         assert "model" in str(exc.value)
 
 
 def test_prompt_version_mismatch_error():
     with pytest.raises(PromptVersionMismatchError) as exc:
-        load_prompt("tests/prompt/data/basic_newer_version.yaml")
+        load_prompt("tests/drtail_prompt/data/basic_newer_version.yaml")
     assert "version" in str(exc.value)
 
 
@@ -42,13 +42,13 @@ def test_prompt_version_mismatch_error():
 )
 def test_prompt_output_validation_error(prompt_path: str):
     with pytest.raises(PromptValidationError) as exc:
-        load_prompt(f"tests/prompt/data/{prompt_path}")
+        load_prompt(f"tests/drtail_prompt/data/{prompt_path}")
     assert "No module named" in str(exc.value)
 
 
 def test_prompt_input_interpolation():
     prompt = load_prompt(
-        "tests/prompt/data/basic_3.yaml", {"location": "moon", "capital": "moon"}
+        "tests/drtail_prompt/data/basic_3.yaml", {"location": "moon", "capital": "moon"}
     )
     assert (
         prompt.messages[0].content.strip()
@@ -58,16 +58,16 @@ def test_prompt_input_interpolation():
 
 def test_prompt_input_model_not_found():
     with pytest.raises(PromptValidationError) as exc:
-        load_prompt("tests/prompt/data/invalid_model_path.yaml", {"location": "moon"})
+        load_prompt("tests/drtail_prompt/data/invalid_model_path.yaml", {"location": "moon"})
     assert "No module" in str(exc.value)
 
 
 def test_prompt_input_validation_error():
     with pytest.raises(PromptValidationError) as exc:
-        load_prompt("tests/prompt/data/basic_3.yaml", {"location": "moon"})
+        load_prompt("tests/drtail_prompt/data/basic_3.yaml", {"location": "moon"})
     assert "capital" in str(exc.value)
 
 
 def test_prompt_get_messages():
-    prompt = load_prompt("tests/prompt/data/basic_1.yaml")
+    prompt = load_prompt("tests/drtail_prompt/data/basic_1.yaml")
     assert prompt.messages[0].content == "You are a helpful assistant that extracts information from a conversation.\nThe capital of {{location}} is {{capital}}.\n"

@@ -1,7 +1,7 @@
 from unittest.mock import Mock, patch
 import pytest
 
-from prompt.core import load_prompt
+from drtail_prompt.core import load_prompt
 
 
 @pytest.fixture
@@ -20,7 +20,7 @@ def mock_openai_client():
 
 
 def test_prompt_should_provide_enough_parameters_for_response_api(mock_openai_client):
-    prompt = load_prompt("tests/prompt/data/basic_1.yaml")
+    prompt = load_prompt("tests/drtail_prompt/data/basic_1.yaml")
     assert prompt is not None
 
     response = mock_openai_client.responses.create(
@@ -53,7 +53,7 @@ def test_prompt_should_provide_enough_parameters_for_response_api(mock_openai_cl
 def test_prompt_should_provide_enough_parameters_for_chat_completion_api(
     mock_openai_client,
 ):
-    prompt = load_prompt("tests/prompt/data/basic_1.yaml")
+    prompt = load_prompt("tests/drtail_prompt/data/basic_1.yaml")
     assert prompt is not None
 
     response = mock_openai_client.chat.completions.create(
@@ -72,7 +72,7 @@ def test_prompt_should_provide_enough_parameters_for_chat_completion_api(
 
 
 def test_prompt_output_should_be_used_as_text_structured_output(mock_openai_client):
-    prompt = load_prompt("tests/prompt/data/basic_1.yaml")
+    prompt = load_prompt("tests/drtail_prompt/data/basic_1.yaml")
     assert prompt is not None
 
     response = mock_openai_client.responses.create(

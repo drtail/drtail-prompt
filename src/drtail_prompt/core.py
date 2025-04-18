@@ -4,8 +4,8 @@ from typing import Any
 import yaml
 from pydantic import BaseModel, ValidationError
 
-from prompt.exception import PromptValidationError
-from prompt.schema import BasicPromptSchema, Message
+from drtail_prompt.exception import PromptValidationError
+from drtail_prompt.schema import BasicPromptSchema, Message
 
 
 class Prompt(BaseModel):
