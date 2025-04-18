@@ -25,7 +25,7 @@ class IOBase(BaseModel):
     model: Optional[str] = Field(default=None)
     schema_: Optional[dict] = Field(default=None, alias="schema")
 
-    instance: BaseModel | None = Field(init=False, default=None)
+    instance: Optional[BaseModel] = Field(init=False, default=None)
 
     def post_init(self, __context: Any) -> None:
         if not self.model or self.type != "pydantic":
