@@ -24,9 +24,9 @@ uv add drtail-prompt
 
 # Using github url
 pip install -e git@github.com:drtail/drtail-prompt.git@1.0.0
-# or 
+# or
 pipenv install -e git@github.com:drtail/drtail-prompt.git@1.0.0
-# or 
+# or
 poetry add -e git@github.com:drtail/drtail-prompt.git@1.0.0
 ```
 
@@ -50,7 +50,7 @@ metadata:
   action: extract
 input:
   type: pydantic
-  model: path.to.your.schema.InputModel  
+  model: path.to.your.schema.InputModel
 output:
   type: pydantic
   model: path.to.your.schema.OutputModel
@@ -100,7 +100,7 @@ response = client.responses.create(
     metadata=prompt.metadata,
 )
 
-# use with 
+# use with
 chat_completion_response = client.chat.completions.create(
     model="gpt-4.1",
     messages=prompt.messages,
@@ -137,7 +137,7 @@ def main():
         )
     except PromptValidationError as e:
         print(f"Validation error: {e}")
-        
+
     # Use with your preferred AI provider
     response = client.responses.create(
         model="gpt-4.1",
@@ -145,7 +145,7 @@ def main():
         metadata=prompt.metadata,
         text=prompt.structured_output_format # structured output
     )
-    
+
 ```
 
 <!-- ## Documentation
@@ -182,4 +182,3 @@ If you encounter any issues or have questions, please:
 
 - Thanks to all contributors who have helped shape this project
 - Special thanks to the open-source community for inspiration and tools
-

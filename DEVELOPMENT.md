@@ -171,4 +171,4 @@ uv pip install --upgrade -e ".[dev]"
 4. Update documentation when changing APIs
 5. Follow PEP 8 style guide
 6. Use type hints
-7. Write docstrings for public APIs 
+7. Write docstrings for public APIs
