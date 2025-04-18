@@ -1,0 +1,59 @@
+name: Schema Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  generate-schema:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install the latest version of uv and set the python version
+        uses: astral-sh/setup-uv@v5
+        with:
+          python-version: '3.9'
+
+      - name: Install package
+        run: uv pip install -e .
+
+      - name: Build package
+        run: uv build
+
+      - name: Generate JSON schema
+        run: uv run drtailpromptctl generate-schema prompt.json
+
+      - name: Create Release
+        id: create_release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: prompt.json
+          name: Release ${{ github.ref_name }}
+          body: |
+            ## Release ${{ github.ref_name }}
+
+            This release includes the JSON schema for YAML autocomplete.
+
+            ### Schema Usage
+
+            You can use this schema in your IDE for YAML autocomplete:
+
+            - **VS Code**: Add to `.vscode/settings.json`:
+              ```json
+              {
+                "yaml.schemas": {
+                  "${{ github.server_url }}/${{ github.repository }}/releases/download/${{ github.ref_name }}/prompt.json": ["*.prompt.yaml", "*.prompt.yml"]
+                }
+              }
+              ```
+
+            - **JetBrains IDEs**: Configure in Settings > Languages & Frameworks > Schemas and DTDs > JSON Schema Mappings:
+              - Schema URL: `${{ github.server_url }}/${{ github.repository }}/releases/download/${{ github.ref_name }}/prompt.json`
+              - File URL pattern: `*.prompt.yaml` or `*.prompt.yml`
+
+            See the [VS Code Integration Guide](https://github.com/${{ github.repository }}/blob/main/VSCODE_INTEGRATION.md) for more details.
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

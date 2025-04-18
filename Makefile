@@ -11,7 +11,7 @@ lint:
 	uvx ruff check . --fix
 
 type-check:
-	uvx --with pydantic,types-PyYAML mypy src/drtail_prompt
+	uvx --with pydantic,types-PyYAML,types-click mypy src/drtail_prompt
 
 security-check:
 	uvx bandit -r src/drtail_prompt

@@ -1,6 +1,5 @@
 api: drtail/prompt
 version: 1.0.0
-
 name: Basic Prompt
 description: A basic prompt for DrTail
 authors:

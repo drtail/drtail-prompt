@@ -33,6 +33,17 @@ poetry add -e git@github.com:drtail/drtail-prompt.git@1.0.0
 ## Quick Start
 
 ### Basic Usage
+0. For better DX, use yaml schema on your favorite IDE
+```json
+// .vscode/settings.json
+{
+     "yaml.schemas": {
+       "https://github.com/drtail/drtail-prompt/releases/download/$CURRENT_VERSION/prompt.json": ["*.prompt.yaml", "*.prompt.yml"] // REPLACE ME!
+     }
+}
+```
+For configuration in jetbrain environment or more, please checkout [INTEGRATION.md](./INTEGRATION.md)
+
 
 1. Define prompt in a predefined file format
 ```yaml

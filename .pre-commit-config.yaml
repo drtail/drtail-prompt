@@ -23,4 +23,4 @@ repos:
     hooks:
     -   id: mypy
         args: ["--explicit-package-bases"]
-        additional_dependencies: [pydantic, types-PyYAML]
+        additional_dependencies: [pydantic, types-PyYAML, types-click]
