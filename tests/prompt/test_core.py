@@ -2,7 +2,6 @@ import pytest
 
 from prompt.core import load_prompt
 from prompt.exception import PromptValidationError, PromptVersionMismatchError
-from prompt.schema import Message
 
 
 @pytest.mark.parametrize(
