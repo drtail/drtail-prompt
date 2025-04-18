@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from pathlib import Path
 from typing import Any
 
@@ -55,7 +57,7 @@ class Prompt(BaseModel):
 
 def load_prompt(path: str, inputs: dict[str, Any] | None = None) -> Prompt:
     filepath = Path(path)
-    with open(filepath, "r") as file:
+    with open(filepath) as file:
         yaml_data = yaml.safe_load(file)
         try:
             prompt = BasicPromptSchema.model_validate(yaml_data)

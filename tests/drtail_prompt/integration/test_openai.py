@@ -1,4 +1,5 @@
 from unittest.mock import Mock, patch
+
 import pytest
 
 from drtail_prompt.core import load_prompt

@@ -1,8 +1,7 @@
 from typing import Any, Optional
-from typing_extensions import Self
-
 
 from pydantic import BaseModel, Field, model_validator
+from typing_extensions import Self
 
 from drtail_prompt.exception import PromptVersionMismatchError
 
