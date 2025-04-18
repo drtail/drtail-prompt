@@ -21,13 +21,9 @@ class Prompt(BaseModel):
         return self.data.messages
 
     @property
-    def metadata(self) -> dict[str, Any]:
-        _metadata = {}
+    def metadata(self) -> dict[str, str]:
+        _metadata: dict[str, str] = {}
         _metadata["name"] = self.data.name
-        _metadata["authors"] = [
-            {"name": author.name, "email": author.email} for author in self.data.authors
-        ]
-
         if self.data.metadata:
             _metadata.update(self.data.metadata.model_dump())
 
@@ -51,7 +47,7 @@ class Prompt(BaseModel):
                 "type": "json_schema",
                 "name": schema["title"],
                 "schema": schema,
-            }
+            },
         }
 
 

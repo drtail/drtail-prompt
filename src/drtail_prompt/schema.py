@@ -120,9 +120,9 @@ class BasicPromptSchema(BaseModel):
         return self
 
     @model_validator(mode="before")
-    def validate_version(cls, data):
+    def validate_version(cls, data: dict[str, Any]) -> dict[str, Any]:
         if data.get("version") != SCHEMA_MAX_VERSION:
             raise PromptVersionMismatchError(
-                f"version must be less than or equal to {SCHEMA_MAX_VERSION}, got {data.get('version')}"
+                f"version must be less than or equal to {SCHEMA_MAX_VERSION}, got {data.get('version')}",
             )
         return data

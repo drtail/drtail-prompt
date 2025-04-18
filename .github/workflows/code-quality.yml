@@ -1,0 +1,47 @@
+name: Code Quality
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  code-quality:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.9"]
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v5
+      with:
+        python-version: ${{ matrix.python-version }}
+        cache: 'pip'
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -e ".[dev]"
+        pip install pre-commit
+
+    - name: Run pre-commit hooks
+      run: |
+        pre-commit install
+        pre-commit run --all-files
+
+    - name: Run Ruff
+      run: |
+        ruff check .
+        ruff format --check .
+
+    - name: Run MyPy
+      run: |
+        mypy .
+
+    - name: Run Bandit
+      run: |
+        bandit -c pyproject.toml -r .

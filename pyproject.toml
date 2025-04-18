@@ -3,14 +3,9 @@ name = "drtail-prompt"
 version = "0.1.0"
 description = "Prompt for DrTail"
 readme = "README.md"
-authors = [
-    { name = "Humphrey Ahn", email = "ahnsv@bc.edu" }
-]
+authors = [{ name = "Humphrey Ahn", email = "ahnsv@bc.edu" }]
 requires-python = ">=3.9"
-dependencies = [
-    "pydantic>=2.11.3",
-    "pyyaml>=6.0.2",
-]
+dependencies = ["pydantic>=2.11.3", "pyyaml>=6.0.2"]
 
 [build-system]
 requires = ["hatchling"]
@@ -20,10 +15,7 @@ build-backend = "hatchling.build"
 packages = ["src/drtail_prompt"]
 
 [dependency-groups]
-dev = [
-    "openai>=1.75.0",
-    "pytest>=8.3.5",
-]
+dev = ["openai>=1.75.0", "pytest>=8.3.5"]
 
 [tool.ruff]
 target-version = "py39"
@@ -31,19 +23,62 @@ line-length = 88
 
 [tool.ruff.lint]
 select = [
-    "E",  # pycodestyle errors
-    "W",  # pycodestyle warnings
-    "F",  # pyflakes
-    "I",  # isort
-    "C",  # flake8-comprehensions
-    "B",  # flake8-bugbear
-    "UP", # pyupgrade
+    "E",   # pycodestyle errors
+    "W",   # pycodestyle warnings
+    "F",   # pyflakes
+    "I",   # isort
+    "C",   # flake8-comprehensions
+    "B",   # flake8-bugbear
+    "UP",  # pyupgrade
+    "A",   # flake8-builtins
+    "COM", # flake8-commas
+    "T",   # flake8-print
+    "RUF", # ruff-specific rules
 ]
 ignore = [
-    "E203",  # Whitespace before ':' (black compatibility)
-    "E501",  # Line too long (handled by black)
+    "E203", # Whitespace before ':' (black compatibility)
+    "E501", # Line too long (handled by black)
+    "S101", # Use of assert detected
 ]
 
 [tool.ruff.lint.isort]
 known-first-party = ["drtail_prompt"]
+combine-as-imports = true
 
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["S101"] # Allow assert in tests
+
+[tool.mypy]
+python_version = "3.9"
+plugins = ['pydantic.mypy']
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+check_untyped_defs = true
+disallow_untyped_decorators = true
+no_implicit_optional = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+warn_no_return = true
+warn_unreachable = true
+strict_optional = true
+follow_imports = "normal"
+follow_imports_for_stubs = true
+mypy_path = "src"
+
+[[tool.mypy.overrides]]
+module = "tests.*"
+ignore_errors = true
+
+[[tool.mypy.overrides]]
+module = "drtail_prompt.*"
+disallow_untyped_defs = true
+check_untyped_defs = true
+
+[tool.bandit]
+exclude_dirs = ["tests"]
+skips = ["B101"]         # Skip assert warnings
+
+[tool.bandit.assert_used]
+skips = ["*_test.py", "*/test_*.py", "*/tests/*"]

@@ -5,7 +5,8 @@ from drtail_prompt.exception import PromptValidationError, PromptVersionMismatch
 
 
 @pytest.mark.parametrize(
-    "prompt_path", ["basic_1.yaml", "basic_2.yaml", "basic_3.yaml"]
+    "prompt_path",
+    ["basic_1.yaml", "basic_2.yaml", "basic_3.yaml"],
 )
 def test_prompt_schema(prompt_path: str):
     prompt = load_prompt(f"tests/drtail_prompt/data/{prompt_path}")
@@ -38,7 +39,8 @@ def test_prompt_version_mismatch_error():
 
 
 @pytest.mark.parametrize(
-    "prompt_path", ["basic_error_1.yaml", "invalid_model_path.yaml"]
+    "prompt_path",
+    ["basic_error_1.yaml", "invalid_model_path.yaml"],
 )
 def test_prompt_output_validation_error(prompt_path: str):
     with pytest.raises(PromptValidationError) as exc:
@@ -48,7 +50,8 @@ def test_prompt_output_validation_error(prompt_path: str):
 
 def test_prompt_input_interpolation():
     prompt = load_prompt(
-        "tests/drtail_prompt/data/basic_3.yaml", {"location": "moon", "capital": "moon"}
+        "tests/drtail_prompt/data/basic_3.yaml",
+        {"location": "moon", "capital": "moon"},
     )
     assert (
         prompt.messages[0].content.strip()
@@ -73,7 +76,8 @@ def test_prompt_input_nested_interpolation():
 def test_prompt_input_model_not_found():
     with pytest.raises(PromptValidationError) as exc:
         load_prompt(
-            "tests/drtail_prompt/data/invalid_model_path.yaml", {"location": "moon"}
+            "tests/drtail_prompt/data/invalid_model_path.yaml",
+            {"location": "moon"},
         )
     assert "No module" in str(exc.value)
 
