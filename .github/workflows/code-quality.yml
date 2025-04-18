@@ -40,3 +40,7 @@ jobs:
     - name: Run Bandit
       run: |
         make security-check
+
+    - name: Run Tests
+      run: |
+        make test
