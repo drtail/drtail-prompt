@@ -79,6 +79,25 @@ class Message(BaseModel):
     content: str
 
 
+def _nested_format(template: str, data_dict: dict[str, Any]) -> str:
+    import re
+
+    placeholders = re.findall(r"\{([^{}]+)\}", template)
+    result = template
+
+    for placeholder in placeholders:
+        keys = placeholder.split(".")
+        value = data_dict
+        try:
+            for key in keys:
+                value = value[key]
+            result = result.replace(f"{{{placeholder}}}", str(value))
+        except (KeyError, TypeError):
+            pass
+
+    return result
+
+
 class BasicPromptSchema(BaseModel):
     api: str
     version: str
@@ -97,7 +116,8 @@ class BasicPromptSchema(BaseModel):
         for message in self.messages:
             # TODO: use jinja2 to interpolate the message content
             message.content = message.content.replace("{{", "{").replace("}}", "}")
-            message.content = message.content.format(**data)
+            # Handle nested dictionary access in template variables
+            message.content = _nested_format(message.content, data)
         return self
 
     @model_validator(mode="before")

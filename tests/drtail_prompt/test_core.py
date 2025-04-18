@@ -56,9 +56,25 @@ def test_prompt_input_interpolation():
     )
 
 
+def test_prompt_input_nested_interpolation():
+    prompt = load_prompt(
+        "tests/drtail_prompt/data/advanced.yaml",
+        {
+            "nested": {"location": "moon", "capital": "moon", "number": 1},
+            "nested_nested": {"inner": {"location": "moon", "capital": "moon"}},
+        },
+    )
+    assert (
+        prompt.messages[0].content.strip()
+        == "You are a helpful assistant that extracts information from a conversation.\nThe capital of moon is moon.\nThe number is moon and moon."
+    )
+
+
 def test_prompt_input_model_not_found():
     with pytest.raises(PromptValidationError) as exc:
-        load_prompt("tests/drtail_prompt/data/invalid_model_path.yaml", {"location": "moon"})
+        load_prompt(
+            "tests/drtail_prompt/data/invalid_model_path.yaml", {"location": "moon"}
+        )
     assert "No module" in str(exc.value)
 
 
@@ -70,4 +86,7 @@ def test_prompt_input_validation_error():
 
 def test_prompt_get_messages():
     prompt = load_prompt("tests/drtail_prompt/data/basic_1.yaml")
-    assert prompt.messages[0].content == "You are a helpful assistant that extracts information from a conversation.\nThe capital of {{location}} is {{capital}}.\n"
+    assert (
+        prompt.messages[0].content
+        == "You are a helpful assistant that extracts information from a conversation.\nThe capital of {{location}} is {{capital}}.\n"
+    )
