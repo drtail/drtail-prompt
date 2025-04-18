@@ -18,6 +18,9 @@ security-check:
 
 check: format lint type-check security-check
 
+test:
+	uv run python -m pytest tests/
+
 clean:
 	rm -rf build/
 	rm -rf dist/
