@@ -20,28 +20,21 @@ pip install drtail-prompt
 poetry add drtail-prompt
 
 # Using uv
-uv pip install drtail-prompt
+uv add drtail-prompt
 
 # Using github url
-pip install -e ...
+pip install -e git@github.com:drtail/drtail-prompt.git@1.0.0
+# or 
+pipenv install -e git@github.com:drtail/drtail-prompt.git@1.0.0
+# or 
+poetry add -e git@github.com:drtail/drtail-prompt.git@1.0.0
 ```
 
 ## Quick Start
 
 ### Basic Usage
 
-```python
-from drtail_prompt import load_prompt
-
-# Load a prompt from YAML file
-prompt = load_prompt("path/to/prompt.yaml")
-
-# Use the prompt with input variables
-response = prompt.format(location="moon", capital="moon")
-```
-
-### YAML Prompt Format
-
+1. Define prompt in a predefined file format
 ```yaml
 api: drtail/prompt
 version: 1.0.0
@@ -55,6 +48,9 @@ metadata:
   role: todo
   domain: consultation
   action: extract
+input:
+  type: pydantic
+  model: path.to.your.schema.InputModel  
 output:
   type: pydantic
   model: path.to.your.schema.OutputModel
@@ -68,6 +64,52 @@ messages:
     content: What is the capital of the moon?
 ```
 
+## Prompt YAML Schema
+
+The following table describes all available fields in the prompt YAML schema:
+
+| Field | Description | Default | Options |
+|-------|-------------|---------|---------|
+| `api` | API identifier for the prompt format | Required | `drtail/prompt` |
+| `version` | Schema version | Required | `1.0.0` |
+| `name` | Name of the prompt | Required | Any string |
+| `description` | Description of the prompt | `""` | Any string |
+| `authors` | List of prompt authors | Required | Array of author objects with `name` and `email` |
+| `metadata` | Additional metadata for the prompt | `{}` | Any key-value pairs |
+| `input` | Input schema definition | Optional | Object with `type` and `model` |
+| `output` | Output schema definition | Optional | Object with `type` and `model` |
+| `(input,output).type` | Type of input schema | `"pydantic"` | `pydantic` (only at this moment) |
+| `(input,output).model` | Path to input schema model | Required if `input` is defined | Valid Python import path |
+| `messages` | List of messages in the prompt | Required | Array of message objects |
+| `messages[].role` | Role of the message | Required | `system`, `user`, `assistant`, `developer` |
+| `messages[].content` | Content of the message | Required | Any string, can include `{{variable}}` placeholders |
+
+
+
+2. Use the prompt with your favorite ai toolings
+```python
+from drtail_prompt import load_prompt
+
+# Load a prompt from YAML file
+prompt = load_prompt("path/to/prompt.yaml")
+
+# Use the prompt with input variables
+response = client.responses.create(
+    model="gpt-4.1",
+    input=prompt.messages,
+    metadata=prompt.metadata,
+)
+
+# use with 
+chat_completion_response = client.chat.completions.create(
+    model="gpt-4.1",
+    messages=prompt.messages,
+    metadata=prompt.metadata,
+)
+
+```
+
+
 ### Output Validation
 
 Define your output schema using Pydantic:
@@ -75,36 +117,40 @@ Define your output schema using Pydantic:
 ```python
 from pydantic import BaseModel
 
-class BasicPromptOutput(BaseModel):
+class BasicPromptInput(BaseModel):
     location: str
     capital: str
-```
 
-### Advanced Usage
+class BasicPromptOutput(BaseModel):
+    text: str
+```
 
 ```python
 from drtail_prompt import load_prompt, PromptValidationError
 
-try:
-    # Load prompt with input validation
-    prompt = load_prompt(
-        "path/to/prompt.yaml",
-        input_variables={"location": "moon", "capital": "moon"}
+def main():
+    try:
+        # Load prompt with input validation
+        prompt = load_prompt(
+            "path/to/prompt.yaml",
+            input_variables={"location": "moon", "capital": "moon"}
+        )
+    except PromptValidationError as e:
+        print(f"Validation error: {e}")
+        
+    # Use with your preferred AI provider
+    response = client.responses.create(
+        model="gpt-4.1",
+        input=prompt.messages,
+        metadata=prompt.metadata,
+        text=prompt.structured_output_format # structured output
     )
     
-    # Get formatted messages
-    messages = prompt.messages
-    
-    # Use with your preferred AI provider
-    response = your_ai_provider.generate(messages)
-    
-except PromptValidationError as e:
-    print(f"Validation error: {e}")
 ```
 
-## Documentation
+<!-- ## Documentation
 
-For detailed documentation, please visit [documentation link].
+For detailed documentation, please visit [documentation link]. -->
 
 ## Contributing
 
