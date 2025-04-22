@@ -1,5 +1,5 @@
 api: drtail/prompt@v1
-version: 1.0.0
+version: 1_0_0
 
 name: Basic Prompt
 description: A basic prompt for DrTail
@@ -10,16 +10,7 @@ metadata:
   role: todo
   domain: consultation
   action: extract
-# TODO: Add output
-# output:
-#   type: pydantic
-#   schema:
-#     name: BasicPromptOutput
-#     fields:
-#       - name: location
-#         type: str
-#       - name: capital
-#         type: str
+
 
 messages:
   - role: developer

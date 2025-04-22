@@ -1,7 +1,7 @@
 import pytest
 
 from drtail_prompt.core import load_prompt
-from drtail_prompt.exception import PromptValidationError, PromptVersionMismatchError
+from drtail_prompt.exception import PromptValidationError
 
 
 @pytest.mark.parametrize(
@@ -11,7 +11,7 @@ from drtail_prompt.exception import PromptValidationError, PromptVersionMismatch
 def test_prompt_schema(prompt_path: str):
     prompt = load_prompt(f"tests/drtail_prompt/data/{prompt_path}")
 
-    assert prompt.data.api == "drtail/prompt"
+    assert prompt.data.api == "drtail/prompt@v1"
     assert prompt.data.version == "1.0.0"
     assert prompt.data.name == "Basic Prompt"
     assert prompt.data.description == "A basic prompt for DrTail"
@@ -32,10 +32,15 @@ def test_prompt_validation_error():
         assert "model" in str(exc.value)
 
 
-def test_prompt_version_mismatch_error():
-    with pytest.raises(PromptVersionMismatchError) as exc:
-        load_prompt("tests/drtail_prompt/data/basic_newer_version.yaml")
+def test_prompt_version_validation_error():
+    with pytest.raises(PromptValidationError) as exc:
+        load_prompt("tests/drtail_prompt/data/basic_error_version.yaml")
     assert "version" in str(exc.value)
+
+
+def test_prompt_has_empty_authors_should_have_no_last_modified_by():
+    prompt = load_prompt("tests/drtail_prompt/data/basic_error_authors.yaml")
+    assert prompt.metadata.get("last_modified_by") is None
 
 
 @pytest.mark.parametrize(

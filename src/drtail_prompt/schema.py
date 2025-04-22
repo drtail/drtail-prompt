@@ -1,11 +1,7 @@
 from typing import Any, Optional
 
-from pydantic import BaseModel, Field, model_validator
+from pydantic import BaseModel, ConfigDict, Field, model_validator
 from typing_extensions import Self
-
-from drtail_prompt.exception import PromptVersionMismatchError
-
-SCHEMA_MAX_VERSION = "1.0.0"
 
 
 class Author(BaseModel):
@@ -14,9 +10,11 @@ class Author(BaseModel):
 
 
 class Metadata(BaseModel):
-    role: str
-    domain: str
-    action: str
+    role: Optional[str] = Field(default=None)
+    domain: Optional[str] = Field(default=None)
+    action: Optional[str] = Field(default=None)
+
+    model_config = ConfigDict(extra="allow")
 
 
 class IOBase(BaseModel):
@@ -97,16 +95,56 @@ def _nested_format(template: str, data_dict: dict[str, Any]) -> str:
     return result
 
 
+def is_valid_semver(version: str) -> bool:
+    try:
+        parts = version.split(".")
+        if len(parts) < 2 or len(parts) > 3:
+            return False
+
+        for part in parts:
+            if "+" in part:
+                part = part.split("+")[0]
+            if "-" in part:
+                part = part.split("-")[0]
+
+            if not part.isdigit() or int(part) < 0:
+                return False
+
+        return True
+    except Exception:
+        return False
+
+
 class BasicPromptSchema(BaseModel):
-    api: str
-    version: str
-    name: str
-    description: str
-    authors: list[Author]
-    metadata: Metadata
-    input: Optional[Input] = Field(default=None)
-    output: Optional[Output] = Field(default=None)
-    messages: list[Message]
+    api: str = Field(
+        default="drtail/prompt@v1",
+        description="Schema API. Should be fixed to drtail/prompt@v1 for backward compatibility.",
+    )
+    version: str = Field(
+        default="1.0.0",
+        description="Prompt version. Should be a valid semantic version. This will appear in the tag of the prompt.",
+    )
+    name: str = Field(
+        description="Name of the prompt. Intended to be used as a unique identifier. This will appear in the tag of the prompt.",
+    )
+    description: str = Field(
+        description="Description of the prompt. Should be concise and to the point.",
+    )
+    authors: list[Author] = Field(
+        description="Authors of the prompt. Include all authors who have contributed to the prompt.",
+    )
+    metadata: Metadata = Field(
+        description="Metadata of the prompt. Recommend to include role, domain, and action. Feel free to add more fields as needed.",
+    )
+    input: Optional[Input] = Field(
+        default=None,
+        description="Input of the prompt. If the prompt does not require input, set it to None.",
+    )
+    output: Optional[Output] = Field(
+        default=None,
+        description="Output of the prompt. If the prompt does not require output, set it to None.",
+    )
+    messages: list[Message] = Field(description="Messages of the prompt.")
 
     class Config:
         from_attributes = True
@@ -121,8 +159,29 @@ class BasicPromptSchema(BaseModel):
 
     @model_validator(mode="before")
     def validate_version(cls, data: dict[str, Any]) -> dict[str, Any]:
-        if data.get("version") != SCHEMA_MAX_VERSION:
-            raise PromptVersionMismatchError(
-                f"version must be less than or equal to {SCHEMA_MAX_VERSION}, got {data.get('version')}",
-            )
+        version = data.get("version")
+        if not version:
+            raise ValueError("Version is required")
+        if not is_valid_semver(version):
+            raise ValueError("Invalid version")
+        return data
+
+    @model_validator(mode="before")
+    def validate_api(cls, data: dict[str, Any]) -> dict[str, Any]:
+        try:
+            api = data["api"]
+            api_name, api_version = api.split("@")
+        except KeyError as e:
+            raise ValueError("API is required") from e
+        except ValueError as e:
+            raise ValueError(
+                "Invalid API format. Should be like drtail/prompt@v1",
+            ) from e
+
+        if api_name != "drtail/prompt":
+            raise ValueError("Invalid API name. Should be drtail/prompt")
+
+        if api_version != "v1":
+            raise NotImplementedError("Only v1 is supported for now")
+
         return data
