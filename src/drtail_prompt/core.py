@@ -10,6 +10,10 @@ from drtail_prompt.exception import PromptValidationError
 from drtail_prompt.schema import BasicPromptSchema, Message
 
 
+def slugify_name(name: str) -> str:
+    return name.lower().replace(" ", "-")
+
+
 class Prompt(BaseModel):
     data: BasicPromptSchema
 
@@ -23,7 +27,11 @@ class Prompt(BaseModel):
     @property
     def metadata(self) -> dict[str, str]:
         _metadata: dict[str, str] = {}
-        _metadata["name"] = self.data.name
+        _metadata["name"] = slugify_name(self.data.name)
+        _metadata["version"] = self.data.version
+        if self.data.authors:
+            _metadata["last_modified_by"] = self.data.authors[-1].email
+
         if self.data.metadata:
             _metadata.update(self.data.metadata.model_dump())
 

@@ -9,6 +9,8 @@ A scalable and manageable prompt format for AI model interactions.
 - **Input/Output Validation**: Robust validation using Pydantic models
 - **Multi-Provider Support**: Seamless integration with various AI model providers
 - **Type Safety**: Full type hints and validation for better development experience
+- **Nested Variable Support**: Advanced template variable interpolation with nested object access
+- **Structured Output**: Enhanced JSON schema support for AI model outputs
 
 ## Installation
 
@@ -47,10 +49,9 @@ For configuration in jetbrain environment or more, please checkout [INTEGRATION.
 
 1. Define prompt in a predefined file format
 ```yaml
-api: drtail/prompt
-version: 1.0.0
-
+api: drtail/prompt@v1@v1
 name: Basic Prompt
+version: 1.0.0
 description: A basic prompt for DrTail
 authors:
   - name: Your Name
@@ -81,7 +82,7 @@ The following table describes all available fields in the prompt YAML schema:
 
 | Field | Description | Default | Options |
 |-------|-------------|---------|---------|
-| `api` | API identifier for the prompt format | Required | `drtail/prompt` |
+| `api` | API identifier for the prompt format | Required | `drtail/prompt@v1` |
 | `version` | Schema version | Required | `1.0.0` |
 | `name` | Name of the prompt | Required | Any string |
 | `description` | Description of the prompt | `""` | Any string |
@@ -93,9 +94,7 @@ The following table describes all available fields in the prompt YAML schema:
 | `(input,output).model` | Path to input schema model | Required if `input` is defined | Valid Python import path |
 | `messages` | List of messages in the prompt | Required | Array of message objects |
 | `messages[].role` | Role of the message | Required | `system`, `user`, `assistant`, `developer` |
-| `messages[].content` | Content of the message | Required | Any string, can include `{{variable}}` placeholders |
-
-
+| `messages[].content` | Content of the message | Required | Any string, can include `{{variable}}` placeholders with nested object access (e.g., `{{nested.object.field}}`) |
 
 2. Use the prompt with your favorite ai toolings
 ```python
@@ -109,17 +108,16 @@ response = client.responses.create(
     model="gpt-4.1",
     input=prompt.messages,
     metadata=prompt.metadata,
+    text=prompt.structured_output_format,  # Enhanced structured output support
 )
 
-# use with
+# use with chat completion
 chat_completion_response = client.chat.completions.create(
     model="gpt-4.1",
     messages=prompt.messages,
     metadata=prompt.metadata,
 )
-
 ```
-
 
 ### Output Validation
 
@@ -144,7 +142,7 @@ def main():
         # Load prompt with input validation
         prompt = load_prompt(
             "path/to/prompt.yaml",
-            input_variables={"location": "moon", "capital": "moon"}
+            inputs={"location": "moon", "capital": "moon"}
         )
     except PromptValidationError as e:
         print(f"Validation error: {e}")
@@ -154,14 +152,32 @@ def main():
         model="gpt-4.1",
         input=prompt.messages,
         metadata=prompt.metadata,
-        text=prompt.structured_output_format # structured output
+        text=prompt.structured_output_format  # Enhanced structured output support
     )
-
 ```
 
-<!-- ## Documentation
+### Nested Variable Support
 
-For detailed documentation, please visit [documentation link]. -->
+The prompt format supports nested variable interpolation:
+
+```yaml
+messages:
+  - role: developer
+    content: |
+      The capital of {{nested.location}} is {{nested.capital}}.
+      The number is {{nested_nested.inner.location}} and {{nested_nested.inner.capital}}.
+```
+
+```python
+# Use with nested input data
+prompt = load_prompt(
+    "path/to/prompt.yaml",
+    inputs={
+        "nested": {"location": "moon", "capital": "moon"},
+        "nested_nested": {"inner": {"location": "moon", "capital": "moon"}}
+    }
+)
+```
 
 ## Contributing
 
@@ -178,16 +194,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## Code of Conduct
 
 Please read our [Code of Conduct](CODE_OF_CONDUCT.md) to understand our community guidelines.
-
-<!-- ## Support
-
-If you encounter any issues or have questions, please:
-1. Check the [issue tracker](https://github.com/yourusername/dr-tail-prompt/issues)
-2. Join our [community chat](https://github.com/yourusername/dr-tail-prompt/discussions)
-
-## Authors
-
-- Your Name - Initial work - [YourGitHub](https://github.com/yourusername) -->
 
 ## Acknowledgments
 

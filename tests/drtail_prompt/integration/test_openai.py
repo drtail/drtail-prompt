@@ -44,7 +44,8 @@ def test_prompt_should_provide_enough_parameters_for_response_api(mock_openai_cl
         assert message.content is not None
 
     assert prompt.metadata is not None
-    assert prompt.metadata["name"] == "Basic Prompt"
+    assert prompt.metadata["name"] == "basic-prompt"
+    assert prompt.metadata["version"] == "1.0.0"
     assert prompt.metadata["role"] == "todo"
     assert prompt.metadata["domain"] == "consultation"
     assert prompt.metadata["action"] == "extract"
@@ -64,7 +65,8 @@ def test_prompt_should_provide_enough_parameters_for_chat_completion_api(
     assert response is not None
 
     assert prompt.metadata is not None
-    assert prompt.metadata["name"] == "Basic Prompt"
+    assert prompt.metadata["name"] == "basic-prompt"
+    assert prompt.metadata["version"] == "1.0.0"
     assert prompt.metadata["role"] == "todo"
     assert prompt.metadata["domain"] == "consultation"
     assert prompt.metadata["action"] == "extract"
