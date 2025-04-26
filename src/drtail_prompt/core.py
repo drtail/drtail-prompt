@@ -25,6 +25,10 @@ class Prompt(BaseModel):
         return self.data.messages
 
     @property
+    def messages_dict(self) -> list[dict[str, str]]:
+        return [message.model_dump() for message in self.messages]
+
+    @property
     def metadata(self) -> dict[str, str]:
         _metadata: dict[str, str] = {}
         _metadata["name"] = slugify_name(self.data.name)

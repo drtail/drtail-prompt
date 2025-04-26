@@ -99,3 +99,17 @@ def test_prompt_get_messages():
         prompt.messages[0].content
         == "You are a helpful assistant that extracts information from a conversation.\nThe capital of {{location}} is {{capital}}.\n"
     )
+
+
+def test_prompt_get_messages_dict():
+    prompt = load_prompt("tests/drtail_prompt/data/basic_1.yaml")
+    assert prompt.messages_dict == [
+        {
+            "role": "developer",
+            "content": "You are a helpful assistant that extracts information from a conversation.\nThe capital of {{location}} is {{capital}}.\n",
+        },
+        {
+            "role": "user",
+            "content": "What is the capital of the moon?",
+        },
+    ]
