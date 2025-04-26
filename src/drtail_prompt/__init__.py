@@ -15,4 +15,6 @@ __all__ = [
     "load_prompt",
 ]
 
-__version__ = "0.1.0"
+from importlib.metadata import version
+
+__version__ = version("drtail-prompt")
