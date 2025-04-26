@@ -15,6 +15,12 @@ def cli() -> None:
     pass
 
 
+@cli.group()
+def meta() -> None:
+    """Controls library itself."""
+    pass
+
+
 @cli.command()
 @click.argument(
     "output",
@@ -39,6 +45,36 @@ def generate_schema(output: Path | None = None) -> None:
         json.dump(json_schema, f, indent=2, default=pydantic_encoder)
 
     click.echo(f"JSON schema generated successfully: {output}")
+
+
+@cli.command()
+def version() -> None:
+    """Print the version of the library."""
+    from drtail_prompt import __version__
+
+    click.echo(__version__)
+
+
+@meta.command()
+@click.argument("version", type=str)
+def bump_version(version: str) -> None:
+    """Bump the version of the library.
+
+    VERSION is the new version of the library.
+    """
+    import tomli
+    import tomli_w  # type: ignore
+
+    # Update pyproject.toml
+    with open("pyproject.toml", "rb") as f:
+        data = tomli.load(f)
+
+    data["project"]["version"] = version
+
+    with open("pyproject.toml", "wb") as f:
+        tomli_w.dump(data, f)
+
+    click.echo(f"Version bumped to {version} in pyproject.toml")
 
 
 if __name__ == "__main__":

@@ -179,6 +179,24 @@ prompt = load_prompt(
 )
 ```
 
+### CLI
+
+The Dr.Tail Prompt package includes a command-line interface (CLI) for common operations:
+
+```bash
+# Generate JSON schema from the YAML prompt schema
+drtail-prompt generate-schema [OUTPUT]
+
+# Bump the version of the library
+drtail-prompt meta bump-version VERSION
+```
+
+#### Command Details
+
+- **generate-schema**: Generates a JSON schema from the YAML prompt schema file. If no output path is specified, it defaults to `prompt.json` in the current directory.
+
+- **meta bump-version**: Updates the version number in the pyproject.toml file to the specified version.
+
 ## Contributing
 
 We welcome contributions! Please see our [Contributing Guidelines](CONTRIBUTING.md) for details on how to submit pull requests, report issues, and contribute to the project.
