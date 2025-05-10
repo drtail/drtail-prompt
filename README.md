@@ -11,6 +11,7 @@ A scalable and manageable prompt format for AI model interactions.
 - **Type Safety**: Full type hints and validation for better development experience
 - **Nested Variable Support**: Advanced template variable interpolation with nested object access
 - **Structured Output**: Enhanced JSON schema support for AI model outputs
+- **Jinja2 Template Support**: Full support for Jinja2 templating syntax in prompt messages
 
 ## Installation
 
@@ -94,7 +95,7 @@ The following table describes all available fields in the prompt YAML schema:
 | `(input,output).model` | Path to input schema model | Required if `input` is defined | Valid Python import path |
 | `messages` | List of messages in the prompt | Required | Array of message objects |
 | `messages[].role` | Role of the message | Required | `system`, `user`, `assistant`, `developer` |
-| `messages[].content` | Content of the message | Required | Any string, can include `{{variable}}` placeholders with nested object access (e.g., `{{nested.object.field}}`) |
+| `messages[].content` | Content of the message | Required | Any string, supports both `{{variable}}` placeholders and full Jinja2 templating syntax (e.g., `{% if condition %}...{% endif %}`, `{% for item in items %}...{% endfor %}`) |
 
 2. Use the prompt with your favorite ai toolings
 ```python
@@ -175,6 +176,48 @@ prompt = load_prompt(
     inputs={
         "nested": {"location": "moon", "capital": "moon"},
         "nested_nested": {"inner": {"location": "moon", "capital": "moon"}}
+    }
+)
+```
+
+### Jinja2 Template Support
+
+The prompt format supports full Jinja2 templating syntax in message content:
+
+```yaml
+messages:
+  - role: developer
+    content: |
+      {% if user.is_premium %}
+      Welcome premium user! Here's your special content:
+      {% for item in premium_content %}
+      - {{ item.title }}: {{ item.description }}
+      {% endfor %}
+      {% else %}
+      Welcome! Here's your basic content:
+      {% for item in basic_content %}
+      - {{ item.title }}
+      {% endfor %}
+      {% endif %}
+  - role: user
+    content: |
+      {{ some_dict | yaml }} # yaml filter support!
+```
+
+```python
+# Use with Jinja2 template data
+prompt = load_prompt(
+    "path/to/prompt.yaml",
+    inputs={
+        "user": {"is_premium": True},
+        "premium_content": [
+            {"title": "Feature 1", "description": "Premium feature description"},
+            {"title": "Feature 2", "description": "Another premium feature"}
+        ],
+        "basic_content": [
+            {"title": "Basic Feature 1"},
+            {"title": "Basic Feature 2"}
+        ]
     }
 )
 ```

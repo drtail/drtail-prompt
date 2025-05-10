@@ -54,5 +54,5 @@ def yaml(value: str | dict[str, Any], exclude_none: bool = True) -> str:
         return json.dumps(data)
 
 
-environment = Environment(trim_blocks=True, lstrip_blocks=True)
+environment = Environment(trim_blocks=True, lstrip_blocks=True, autoescape=True)
 environment.filters["yaml"] = yaml
