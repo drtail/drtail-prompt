@@ -113,3 +113,32 @@ def test_prompt_get_messages_dict():
             "content": "What is the capital of the moon?",
         },
     ]
+
+
+def test_prompt_input_with_pydantic_model():
+    from tests.drtail_prompt._schema import BasicPromptInput
+
+    prompt = load_prompt(
+        "tests/drtail_prompt/data/basic_3.yaml",
+        BasicPromptInput(location="moon", capital="moon"),
+    )
+    assert (
+        prompt.messages[0].content
+        == "You are a helpful assistant that extracts information from a conversation.\nThe capital of moon is moon.\n"
+    )
+
+
+def test_prompt_input_validation_error_with_base_model_with_invalid_input():
+    from pydantic import BaseModel
+
+    class InvalidInput(BaseModel):
+        location: str
+
+    with pytest.raises(PromptValidationError) as exc:
+        load_prompt(
+            "tests/drtail_prompt/data/basic_3.yaml",
+            InvalidInput(location="moon"),
+        )
+    assert "Input model is not the same as the model defined in the prompt" in str(
+        exc.value,
+    )
