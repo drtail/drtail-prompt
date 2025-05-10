@@ -63,7 +63,7 @@ class Prompt(BaseModel):
         }
 
 
-def load_prompt(path: str, inputs: dict[str, Any] | None = None) -> Prompt:
+def load_prompt(path: str, inputs: dict[str, Any] | BaseModel | None = None) -> Prompt:
     filepath = Path(path)
     with open(filepath) as file:
         yaml_data = yaml.safe_load(file)
@@ -76,7 +76,17 @@ def load_prompt(path: str, inputs: dict[str, Any] | None = None) -> Prompt:
 
     if inputs:
         if not prompt.input:
-            raise PromptValidationError("Input is not defined in the prompt")
+            raise PromptValidationError("Input schema is not defined in the prompt")
+
+        if isinstance(inputs, BaseModel):
+            prompt_input_instance = prompt.input.instance
+            if not prompt_input_instance:
+                raise PromptValidationError("Input model is not defined in the prompt")
+            if inputs.model_json_schema() != prompt_input_instance.model_json_schema():
+                raise PromptValidationError(
+                    "Input model is not the same as the model defined in the prompt",
+                )
+            inputs = inputs.model_dump()
 
         try:
             validated_inputs = prompt.input.instance_validate(inputs)
