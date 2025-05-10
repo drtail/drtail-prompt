@@ -38,6 +38,10 @@ class AdvancedPromptInput2(BaseModel):
     nested: NestedPromptInput
 
 
+class AdvancedPromptInput3(BaseModel):
+    nested_nested: NestedNestedPromptInput
+
+
 class ComplexField(BaseModel):
     name: str
     value: str

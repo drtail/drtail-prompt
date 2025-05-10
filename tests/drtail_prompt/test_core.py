@@ -99,34 +99,45 @@ def test_prompt_input_nested_interpolation_without_field_access():
 
 
 @pytest.mark.parametrize(
-    "nested,expected_output",
+    "prompt_path,inputs,expected_output",
     [
         (
-            {"location": "moon", "capital": "moon", "number": 1},
+            "tests/drtail_prompt/data/advanced_3.yaml",
+            {"nested": {"location": "moon", "capital": "moon", "number": 1}},
             "location: moon\ncapital: moon\nnumber: 1\n",
         ),
         (
-            {"location": "jupiter", "capital": "jupiter", "number": 2},
+            "tests/drtail_prompt/data/advanced_3.yaml",
+            {"nested": {"location": "jupiter", "capital": "jupiter", "number": 2}},
             "location: jupiter\ncapital: jupiter\nnumber: 2\n",
         ),
         (
+            "tests/drtail_prompt/data/advanced_3.yaml",
             {
-                "location": "lorem ipsum",
-                "capital": "dolor sit amet",
-                "number": 999999999999999,
-                "optional_field": "optional field",
+                "nested": {
+                    "location": "lorem ipsum",
+                    "capital": "dolor sit amet",
+                    "number": 999999999999999,
+                    "optional_field": "optional field",
+                },
             },
             "location: lorem ipsum\ncapital: dolor sit amet\nnumber: 999999999999999\noptional_field: optional field\n",
+        ),
+        (
+            "tests/drtail_prompt/data/advanced_4.yaml",
+            {"nested_nested": {"inner": {"location": "moon", "capital": "moon"}}},
+            "inner:\n  location: moon\n  capital: moon\n",
         ),
     ],
 )
 def test_prompt_input_with_custom_yaml_filter(
-    nested: dict[str, Any],
+    prompt_path: str,
+    inputs: dict[str, Any],
     expected_output: str,
 ):
     prompt = load_prompt(
-        "tests/drtail_prompt/data/advanced_3.yaml",
-        {"nested": nested},
+        prompt_path,
+        inputs,
     )
     assert (
         prompt.messages[0].content
