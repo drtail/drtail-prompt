@@ -17,6 +17,12 @@ class NestedPromptInput(BaseModel):
     location: str
     capital: str
     number: int
+
+
+class NestedPromptInput2(BaseModel):
+    location: str
+    capital: str
+    number: int
     optional_field: Optional[str] = None
 
 
@@ -35,7 +41,7 @@ class AdvancedPromptInput(BaseModel):
 
 
 class AdvancedPromptInput2(BaseModel):
-    nested: NestedPromptInput
+    nested: NestedPromptInput2
 
 
 class AdvancedPromptInput3(BaseModel):
