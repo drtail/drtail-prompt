@@ -2,10 +2,13 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
+from typing import Any
 
 import click
 from pydantic.json import pydantic_encoder
 
+from drtail_prompt.core import load_prompt
+from drtail_prompt.exception import PromptValidationError
 from drtail_prompt.schema import BasicPromptSchema
 
 
@@ -19,6 +22,70 @@ def cli() -> None:
 def meta() -> None:
     """Controls library itself."""
     pass
+
+
+@cli.command()
+@click.argument(
+    "prompt_path",
+    type=click.Path(
+        exists=True,
+        dir_okay=False,
+        path_type=Path,
+    ),  # type: ignore
+)
+@click.option(
+    "--set",
+    "set_params",
+    multiple=True,
+    help=(
+        "Set input parameters in the format 'key=value'. Can be used multiple times."
+    ),
+)
+def validate(prompt_path: Path, set_params: tuple[str, ...]) -> None:
+    """Validate a prompt YAML file.
+
+    PROMPT_PATH is the path to the prompt YAML file to validate.
+    """
+    # Convert set parameters to dictionary
+    inputs: dict[str, Any] = {}
+    for param in set_params:
+        try:
+            key, value = param.split("=", 1)
+            # Try to parse value as JSON first, fallback to string
+            try:
+                value = json.loads(value)
+            except json.JSONDecodeError:
+                pass
+            inputs[key] = value
+        except ValueError:
+            click.echo(
+                f"Error: Invalid parameter format '{param}'. Use 'key=value' format.",
+            )
+            raise
+
+    try:
+        # Load and validate the prompt
+        prompt = load_prompt(str(prompt_path), inputs=inputs if inputs else None)
+        click.echo(f"✅ Prompt validation successful: {prompt_path}")
+
+        # Print metadata if available
+        if prompt.metadata:
+            click.echo("\nMetadata:")
+            for key, value in prompt.metadata.items():
+                click.echo(f"  {key}: {value}")
+
+        # Print messages if available
+        if prompt.messages:
+            click.echo("\nMessages:")
+            for msg in prompt.messages:
+                click.echo(f"  [{msg.role}]: {msg.content[:100]}...")
+
+    except PromptValidationError as e:
+        click.echo(f"❌ Validation error: {e}", err=True)
+        raise
+    except Exception as e:
+        click.echo(f"❌ Unexpected error: {e}", err=True)
+        raise
 
 
 @cli.command()
