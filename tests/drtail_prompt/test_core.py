@@ -1,3 +1,5 @@
+from typing import Any
+
 import pytest
 
 from drtail_prompt.core import load_prompt
@@ -93,6 +95,42 @@ def test_prompt_input_nested_interpolation_without_field_access():
     assert (
         "{'location': 'jupiter', 'capital': 'jupiter'}"
         in prompt.messages[0].content.strip()
+    )
+
+
+@pytest.mark.parametrize(
+    "nested,expected_output",
+    [
+        (
+            {"location": "moon", "capital": "moon", "number": 1},
+            "location: moon\ncapital: moon\nnumber: 1\n",
+        ),
+        (
+            {"location": "jupiter", "capital": "jupiter", "number": 2},
+            "location: jupiter\ncapital: jupiter\nnumber: 2\n",
+        ),
+        (
+            {
+                "location": "lorem ipsum",
+                "capital": "dolor sit amet",
+                "number": 999999999999999,
+                "optional_field": "optional field",
+            },
+            "location: lorem ipsum\ncapital: dolor sit amet\nnumber: 999999999999999\noptional_field: optional field\n",
+        ),
+    ],
+)
+def test_prompt_input_with_custom_yaml_filter(
+    nested: dict[str, Any],
+    expected_output: str,
+):
+    prompt = load_prompt(
+        "tests/drtail_prompt/data/advanced_3.yaml",
+        {"nested": nested},
+    )
+    assert (
+        prompt.messages[0].content
+        == f"You are a helpful assistant that extracts information from a conversation.\n{expected_output}"
     )
 
 

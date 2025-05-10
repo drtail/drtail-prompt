@@ -1,8 +1,9 @@
 from typing import Any, Optional
 
-from jinja2 import Template
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 from typing_extensions import Self
+
+from .template import environment
 
 
 class Author(BaseModel):
@@ -133,7 +134,7 @@ class BasicPromptSchema(BaseModel):
 
     def interpolate(self, data: dict[str, Any]) -> "BasicPromptSchema":
         for message in self.messages:
-            template = Template(message.content)
+            template = environment.from_string(message.content)
             message.content = template.render(**data)
         return self
 

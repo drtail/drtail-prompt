@@ -1,3 +1,5 @@
+from typing import Optional
+
 from pydantic import BaseModel
 
 
@@ -15,6 +17,7 @@ class NestedPromptInput(BaseModel):
     location: str
     capital: str
     number: int
+    optional_field: Optional[str] = None
 
 
 class NestedNestedInnerPromptInput(BaseModel):
@@ -29,6 +32,10 @@ class NestedNestedPromptInput(BaseModel):
 class AdvancedPromptInput(BaseModel):
     nested: NestedPromptInput
     nested_nested: NestedNestedPromptInput
+
+
+class AdvancedPromptInput2(BaseModel):
+    nested: NestedPromptInput
 
 
 class ComplexField(BaseModel):
