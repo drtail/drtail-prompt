@@ -1,5 +1,6 @@
 from typing import Any, Optional
 
+from jinja2 import Template
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 from typing_extensions import Self
 
@@ -76,25 +77,6 @@ class Message(BaseModel):
     content: str
 
 
-def _nested_format(template: str, data_dict: dict[str, Any]) -> str:
-    import re
-
-    placeholders = re.findall(r"\{([^{}]+)\}", template)
-    result = template
-
-    for placeholder in placeholders:
-        keys = placeholder.split(".")
-        value = data_dict
-        try:
-            for key in keys:
-                value = value[key]
-            result = result.replace(f"{{{placeholder}}}", str(value))
-        except (KeyError, TypeError):
-            pass
-
-    return result
-
-
 def is_valid_semver(version: str) -> bool:
     try:
         parts = version.split(".")
@@ -151,10 +133,8 @@ class BasicPromptSchema(BaseModel):
 
     def interpolate(self, data: dict[str, Any]) -> "BasicPromptSchema":
         for message in self.messages:
-            # TODO: use jinja2 to interpolate the message content
-            message.content = message.content.replace("{{", "{").replace("}}", "}")
-            # Handle nested dictionary access in template variables
-            message.content = _nested_format(message.content, data)
+            template = Template(message.content)
+            message.content = template.render(**data)
         return self
 
     @model_validator(mode="before")

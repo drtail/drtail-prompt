@@ -78,6 +78,24 @@ def test_prompt_input_nested_interpolation():
     )
 
 
+def test_prompt_input_nested_interpolation_without_field_access():
+    prompt = load_prompt(
+        "tests/drtail_prompt/data/advanced_2.yaml",
+        {
+            "nested": {"location": "moon", "capital": "moon", "number": 1},
+            "nested_nested": {"inner": {"location": "jupiter", "capital": "jupiter"}},
+        },
+    )
+    assert (
+        "{'location': 'moon', 'capital': 'moon', 'number': 1}"
+        in prompt.messages[0].content.strip()
+    )
+    assert (
+        "{'location': 'jupiter', 'capital': 'jupiter'}"
+        in prompt.messages[0].content.strip()
+    )
+
+
 def test_prompt_input_model_not_found():
     with pytest.raises(PromptValidationError) as exc:
         load_prompt(
@@ -124,7 +142,7 @@ def test_prompt_input_with_pydantic_model():
     )
     assert (
         prompt.messages[0].content
-        == "You are a helpful assistant that extracts information from a conversation.\nThe capital of moon is moon.\n"
+        == "You are a helpful assistant that extracts information from a conversation.\nThe capital of moon is moon."
     )
 
 
