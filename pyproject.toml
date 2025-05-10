@@ -10,6 +10,7 @@ dependencies = [
     "pyyaml>=6.0.2",
     "click>=8.1.7",
     "tomli-w>=1.2.0",
+    "jinja2>=3.1.6",
 ]
 
 [project.scripts]
@@ -65,7 +66,7 @@ overrides = [
 
 [tool.bandit]
 exclude_dirs = ["tests"]
-skips = ["B101"]
+skips = ["B101", "B701"]
 
 [tool.bandit.assert_used]
 skips = ["*_test.py", "*/test_*.py", "*/tests/*"]

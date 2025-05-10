@@ -1,0 +1,25 @@
+api: drtail/prompt@v1
+version: 1.0.0
+name: Advanced Prompt 3 (custom yaml filter)
+description: A basic prompt for DrTail
+authors:
+  - name: Humphrey Ahn
+    email: ahnsv@bc.edu
+metadata:
+  role: todo
+  domain: consultation
+  action: extract
+input:
+  type: pydantic
+  model: tests.drtail_prompt._schema.AdvancedPromptInput2 # relative path from this prompt file to schema python file
+output:
+  type: pydantic
+  model: tests.drtail_prompt._schema.AdvancedPromptOutput # relative path from this prompt file to schema python file
+
+messages:
+  - role: developer
+    content: |
+      You are a helpful assistant that extracts information from a conversation.
+      {{ nested | yaml }}
+  - role: user
+    content: What is the capital of the moon?

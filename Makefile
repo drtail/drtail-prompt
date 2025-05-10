@@ -11,10 +11,10 @@ lint:
 	uvx ruff check . --fix
 
 type-check:
-	uvx --with pydantic,types-PyYAML,types-click mypy src/drtail_prompt
+	uvx --with pydantic,types-PyYAML,types-click,types-Jinja2 mypy src/drtail_prompt
 
 security-check:
-	uvx bandit -r src/drtail_prompt
+	uvx 'bandit[toml]' -r src/drtail_prompt -c pyproject.toml
 
 check: format lint type-check security-check
 

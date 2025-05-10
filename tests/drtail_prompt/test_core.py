@@ -1,3 +1,5 @@
+from typing import Any
+
 import pytest
 
 from drtail_prompt.core import load_prompt
@@ -78,6 +80,71 @@ def test_prompt_input_nested_interpolation():
     )
 
 
+def test_prompt_input_nested_interpolation_without_field_access():
+    prompt = load_prompt(
+        "tests/drtail_prompt/data/advanced_2.yaml",
+        {
+            "nested": {"location": "moon", "capital": "moon", "number": 1},
+            "nested_nested": {"inner": {"location": "jupiter", "capital": "jupiter"}},
+        },
+    )
+    assert (
+        "{'location': 'moon', 'capital': 'moon', 'number': 1}"
+        in prompt.messages[0].content.strip()
+    )
+    assert (
+        "{'location': 'jupiter', 'capital': 'jupiter'}"
+        in prompt.messages[0].content.strip()
+    )
+
+
+@pytest.mark.parametrize(
+    "prompt_path,inputs,expected_output",
+    [
+        (
+            "tests/drtail_prompt/data/advanced_3.yaml",
+            {"nested": {"location": "moon", "capital": "moon", "number": 1}},
+            "location: moon\ncapital: moon\nnumber: 1\n",
+        ),
+        (
+            "tests/drtail_prompt/data/advanced_3.yaml",
+            {"nested": {"location": "jupiter", "capital": "jupiter", "number": 2}},
+            "location: jupiter\ncapital: jupiter\nnumber: 2\n",
+        ),
+        (
+            "tests/drtail_prompt/data/advanced_3.yaml",
+            {
+                "nested": {
+                    "location": "lorem ipsum",
+                    "capital": "dolor sit amet",
+                    "number": 999999999999999,
+                    "optional_field": "optional field",
+                },
+            },
+            "location: lorem ipsum\ncapital: dolor sit amet\nnumber: 999999999999999\noptional_field: optional field\n",
+        ),
+        (
+            "tests/drtail_prompt/data/advanced_4.yaml",
+            {"nested_nested": {"inner": {"location": "moon", "capital": "moon"}}},
+            "inner:\n  location: moon\n  capital: moon\n",
+        ),
+    ],
+)
+def test_prompt_input_with_custom_yaml_filter(
+    prompt_path: str,
+    inputs: dict[str, Any],
+    expected_output: str,
+):
+    prompt = load_prompt(
+        prompt_path,
+        inputs,
+    )
+    assert (
+        prompt.messages[0].content
+        == f"You are a helpful assistant that extracts information from a conversation.\n{expected_output}"
+    )
+
+
 def test_prompt_input_model_not_found():
     with pytest.raises(PromptValidationError) as exc:
         load_prompt(
@@ -124,7 +191,7 @@ def test_prompt_input_with_pydantic_model():
     )
     assert (
         prompt.messages[0].content
-        == "You are a helpful assistant that extracts information from a conversation.\nThe capital of moon is moon.\n"
+        == "You are a helpful assistant that extracts information from a conversation.\nThe capital of moon is moon."
     )
 
 
