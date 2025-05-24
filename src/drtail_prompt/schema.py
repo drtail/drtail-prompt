@@ -129,8 +129,7 @@ class BasicPromptSchema(BaseModel):
     )
     messages: list[Message] = Field(description="Messages of the prompt.")
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(extra="forbid")
 
     def interpolate(self, data: dict[str, Any]) -> "BasicPromptSchema":
         for message in self.messages:
