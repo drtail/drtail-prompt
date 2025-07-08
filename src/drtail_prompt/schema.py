@@ -129,7 +129,11 @@ class BasicPromptSchema(BaseModel):
     )
     messages: list[Message] = Field(description="Messages of the prompt.")
 
-    model_config = ConfigDict(extra="forbid")
+    model_config = ConfigDict(
+        extra="forbid",
+        title="Dr.Tail Prompt Schema (Basic)",
+        strict=True,
+    )
 
     def interpolate(self, data: dict[str, Any]) -> "BasicPromptSchema":
         for message in self.messages:

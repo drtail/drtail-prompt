@@ -47,7 +47,7 @@ def test_prompt_has_empty_authors_should_have_no_last_modified_by():
 
 @pytest.mark.parametrize(
     "prompt_path",
-    ["basic_error_1.yaml", "invalid_model_path.yaml"],
+    ["basic_error_1.yaml", "invalid_model_path.prompt.yaml"],
 )
 def test_prompt_output_validation_error(prompt_path: str):
     with pytest.raises(PromptValidationError) as exc:
@@ -148,7 +148,7 @@ def test_prompt_input_with_custom_yaml_filter(
 def test_prompt_input_model_not_found():
     with pytest.raises(PromptValidationError) as exc:
         load_prompt(
-            "tests/drtail_prompt/data/invalid_model_path.yaml",
+            "tests/drtail_prompt/data/invalid_model_path.prompt.yaml",
             {"location": "moon"},
         )
     assert "No module" in str(exc.value)

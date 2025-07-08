@@ -67,13 +67,14 @@ wheels = [
 
 [[package]]
 name = "drtail-prompt"
-version = "0.2.1"
+version = "0.3.1"
 source = { editable = "." }
 dependencies = [
     { name = "click" },
     { name = "jinja2" },
     { name = "pydantic" },
     { name = "pyyaml" },
+    { name = "tomli" },
     { name = "tomli-w" },
 ]
 
@@ -89,6 +90,7 @@ requires-dist = [
     { name = "jinja2", specifier = ">=3.1.6" },
     { name = "pydantic", specifier = ">=2.11.3" },
     { name = "pyyaml", specifier = ">=6.0.2" },
+    { name = "tomli", specifier = ">=2.2.1" },
     { name = "tomli-w", specifier = ">=1.2.0" },
 ]
 
